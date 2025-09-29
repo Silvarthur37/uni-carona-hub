@@ -14,7 +14,350 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      badges: {
+        Row: {
+          created_at: string | null
+          description: string
+          icon: string | null
+          id: string
+          name: string
+          points_required: number
+          type: Database["public"]["Enums"]["badge_type"]
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          icon?: string | null
+          id?: string
+          name: string
+          points_required: number
+          type: Database["public"]["Enums"]["badge_type"]
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          points_required?: number
+          type?: Database["public"]["Enums"]["badge_type"]
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          ride_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          ride_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          ride_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          course: string | null
+          created_at: string | null
+          full_name: string
+          hobbies: string[] | null
+          id: string
+          phone: string | null
+          university: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          course?: string | null
+          created_at?: string | null
+          full_name: string
+          hobbies?: string[] | null
+          id: string
+          phone?: string | null
+          university?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          course?: string | null
+          created_at?: string | null
+          full_name?: string
+          hobbies?: string[] | null
+          id?: string
+          phone?: string | null
+          university?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string
+          rating: number
+          reviewed_id: string
+          reviewer_id: string
+          ride_id: string
+          safety_rating: number | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          rating: number
+          reviewed_id: string
+          reviewer_id: string
+          ride_id: string
+          safety_rating?: number | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          rating?: number
+          reviewed_id?: string
+          reviewer_id?: string
+          ride_id?: string
+          safety_rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_reviewed_id_fkey"
+            columns: ["reviewed_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ride_participants: {
+        Row: {
+          created_at: string | null
+          id: string
+          passenger_id: string
+          ride_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          passenger_id: string
+          ride_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          passenger_id?: string
+          ride_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_participants_passenger_id_fkey"
+            columns: ["passenger_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ride_participants_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rides: {
+        Row: {
+          available_seats: number
+          created_at: string | null
+          departure_time: string
+          description: string | null
+          destination: string
+          destination_lat: number | null
+          destination_lng: number | null
+          driver_id: string
+          id: string
+          is_recurring: boolean | null
+          origin: string
+          origin_lat: number | null
+          origin_lng: number | null
+          price: number | null
+          recurring_days: number[] | null
+          status: Database["public"]["Enums"]["ride_status"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          available_seats: number
+          created_at?: string | null
+          departure_time: string
+          description?: string | null
+          destination: string
+          destination_lat?: number | null
+          destination_lng?: number | null
+          driver_id: string
+          id?: string
+          is_recurring?: boolean | null
+          origin: string
+          origin_lat?: number | null
+          origin_lng?: number | null
+          price?: number | null
+          recurring_days?: number[] | null
+          status?: Database["public"]["Enums"]["ride_status"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          available_seats?: number
+          created_at?: string | null
+          departure_time?: string
+          description?: string | null
+          destination?: string
+          destination_lat?: number | null
+          destination_lng?: number | null
+          driver_id?: string
+          id?: string
+          is_recurring?: boolean | null
+          origin?: string
+          origin_lat?: number | null
+          origin_lng?: number | null
+          price?: number | null
+          recurring_days?: number[] | null
+          status?: Database["public"]["Enums"]["ride_status"] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rides_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_points: {
+        Row: {
+          co2_saved_kg: number | null
+          created_at: string | null
+          id: string
+          points: number | null
+          total_rides_as_driver: number | null
+          total_rides_as_passenger: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          co2_saved_kg?: number | null
+          created_at?: string | null
+          id?: string
+          points?: number | null
+          total_rides_as_driver?: number | null
+          total_rides_as_passenger?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          co2_saved_kg?: number | null
+          created_at?: string | null
+          id?: string
+          points?: number | null
+          total_rides_as_driver?: number | null
+          total_rides_as_passenger?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_points_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +366,18 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      badge_type:
+        | "pontual"
+        | "eco_rider"
+        | "mestre_caronas"
+        | "social"
+        | "musical"
+      ride_status:
+        | "pendente"
+        | "confirmada"
+        | "em_andamento"
+        | "concluida"
+        | "cancelada"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +504,21 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      badge_type: [
+        "pontual",
+        "eco_rider",
+        "mestre_caronas",
+        "social",
+        "musical",
+      ],
+      ride_status: [
+        "pendente",
+        "confirmada",
+        "em_andamento",
+        "concluida",
+        "cancelada",
+      ],
+    },
   },
 } as const
