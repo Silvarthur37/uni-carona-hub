@@ -1,7 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Rocket, Download } from "lucide-react";
 
 const CTA = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-20 px-4">
       <div className="container mx-auto">
@@ -24,9 +27,10 @@ const CTA = () => {
                 size="lg" 
                 variant="secondary"
                 className="text-lg bg-white text-primary hover:bg-white/90 shadow-xl"
+                onClick={() => navigate("/auth")}
               >
                 <Download className="w-5 h-5" />
-                Baixar Agora
+                Começar Agora
               </Button>
               <Button 
                 size="lg" 

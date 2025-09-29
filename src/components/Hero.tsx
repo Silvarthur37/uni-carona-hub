@@ -1,15 +1,17 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Car, Sparkles, Users } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
       
       <div className="container relative z-10 px-4 py-20 mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
           <div className="text-center lg:text-left space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-card rounded-full shadow-card border border-border">
               <Sparkles className="w-4 h-4 text-primary" />
@@ -29,7 +31,7 @@ const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button variant="hero" size="lg" className="text-lg">
+              <Button variant="hero" size="lg" className="text-lg" onClick={() => navigate("/auth")}>
                 <Users className="w-5 h-5" />
                 Começar Agora
               </Button>
@@ -55,7 +57,6 @@ const Hero = () => {
             </div>
           </div>
           
-          {/* Right Image */}
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-glow opacity-20 blur-3xl rounded-full animate-glow" />
             <img 
