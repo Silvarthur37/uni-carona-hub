@@ -10,6 +10,7 @@ import CreateRide from "./pages/CreateRide";
 import SearchRides from "./pages/SearchRides";
 import MyRides from "./pages/MyRides";
 import RideDetails from "./pages/RideDetails";
+import PrivateChat from "./pages/PrivateChat";
 import Profile from "./pages/Profile";
 import Ranking from "./pages/Ranking";
 import NotFound from "./pages/NotFound";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/search-rides" element={<SearchRides />} />
           <Route path="/my-rides" element={<MyRides />} />
           <Route path="/ride/:id" element={<RideDetails />} />
+          <Route path="/chat/:userId" element={<PrivateChat />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/ranking" element={<Ranking />} />
           <Route path="*" element={<NotFound />} />

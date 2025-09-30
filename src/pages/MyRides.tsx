@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Car, Users, MapPin, Calendar, Check, X } from "lucide-react";
+import { ArrowLeft, Car, Users, MapPin, Calendar, Check, X, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
@@ -216,34 +216,47 @@ const MyRides = () => {
                               </span>
                             </div>
 
-                            {participant.status === "pendente" && (
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  onClick={() =>
-                                    handleUpdateParticipantStatus(
-                                      participant.id,
-                                      "confirmado"
-                                    )
-                                  }
-                                >
-                                  <Check className="w-4 h-4" />
-                                </Button>
+                            <div className="flex gap-2">
+                              {participant.status === "confirmado" && (
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   onClick={() =>
-                                    handleUpdateParticipantStatus(
-                                      participant.id,
-                                      "recusado"
-                                    )
+                                    navigate(`/chat/${participant.profiles.id}?ride=${ride.id}`)
                                   }
                                 >
-                                  <X className="w-4 h-4" />
+                                  <MessageCircle className="w-4 h-4" />
                                 </Button>
-                              </div>
-                            )}
+                              )}
+                              {participant.status === "pendente" && (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    variant="secondary"
+                                    onClick={() =>
+                                      handleUpdateParticipantStatus(
+                                        participant.id,
+                                        "confirmado"
+                                      )
+                                    }
+                                  >
+                                    <Check className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() =>
+                                      handleUpdateParticipantStatus(
+                                        participant.id,
+                                        "recusado"
+                                      )
+                                    }
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -311,13 +324,23 @@ const MyRides = () => {
                             {participant.status}
                           </span>
                           {participant.status === "confirmado" && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => navigate(`/ride/${ride.id}`)}
-                            >
-                              Ver Chat
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => navigate(`/chat/${ride.driver_id}?ride=${ride.id}`)}
+                              >
+                                <MessageCircle className="w-4 h-4 mr-1" />
+                                Chat Privado
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => navigate(`/ride/${ride.id}`)}
+                              >
+                                Chat do Grupo
+                              </Button>
+                            </div>
                           )}
                         </div>
                       </div>
