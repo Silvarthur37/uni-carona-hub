@@ -12,7 +12,11 @@ import MyRides from "./pages/MyRides";
 import RideDetails from "./pages/RideDetails";
 import PrivateChat from "./pages/PrivateChat";
 import Profile from "./pages/Profile";
+import ProfileEdit from "./pages/ProfileEdit";
 import Ranking from "./pages/Ranking";
+import Map from "./pages/Map";
+import Favorites from "./pages/Favorites";
+import UsersList from "./pages/UsersList";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,7 +37,11 @@ const App = () => (
           <Route path="/ride/:id" element={<RideDetails />} />
           <Route path="/chat/:userId" element={<PrivateChat />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/edit" element={<ProfileEdit />} />
           <Route path="/ranking" element={<Ranking />} />
+          <Route path="/map" element={<Map />} />
+          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/users" element={<UsersList />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

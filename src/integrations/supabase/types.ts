@@ -44,6 +44,42 @@ export type Database = {
         }
         Relationships: []
       }
+      favorite_locations: {
+        Row: {
+          address: string
+          created_at: string | null
+          icon: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          address: string
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          address?: string
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string

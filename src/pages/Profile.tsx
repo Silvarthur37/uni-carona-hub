@@ -2,227 +2,146 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { MessageCircle, LogOut, KeyRound, Settings, HelpCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, User, Save } from "lucide-react";
+import BottomNav from "@/components/BottomNav";
 
 const Profile = () => {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState({
-    full_name: "",
-    course: "",
-    university: "",
-    phone: "",
-    hobbies: [] as string[],
-  });
-  const [hobbiesText, setHobbiesText] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [user, setUser] = useState<any>(null);
+  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkUser();
   }, []);
 
   const checkUser = async () => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
-      }
-      setUser(user);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (profileData) {
-        setProfile({
-          full_name: profileData.full_name || "",
-          course: profileData.course || "",
-          university: profileData.university || "",
-          phone: profileData.phone || "",
-          hobbies: profileData.hobbies || [],
-        });
-        setHobbiesText((profileData.hobbies || []).join(", "));
-      }
-    } catch (error: any) {
-      console.error("Erro ao carregar perfil:", error);
-    } finally {
-      setLoading(false);
+    if (!user) {
+      navigate("/auth");
+      return;
     }
+
+    setUser(user);
+    setEmail(user.email || "");
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (profile) {
+      setFullName(profile.full_name || "");
+    }
+
+    setLoading(false);
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
 
-    try {
-      const hobbiesArray = hobbiesText
-        .split(",")
-        .map((h) => h.trim())
-        .filter((h) => h);
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          full_name: profile.full_name,
-          course: profile.course,
-          university: profile.university,
-          phone: profile.phone,
-          hobbies: hobbiesArray,
-        })
-        .eq("id", user.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Perfil atualizado!",
-        description: "Suas informações foram salvas com sucesso",
-      });
-
-      navigate("/dashboard");
-    } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setSaving(false);
-    }
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+        <p>Carregando perfil...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+    <div className="min-h-screen bg-background pb-20">
+      <div className="max-w-screen-xl mx-auto p-4">
+        <h1 className="text-3xl font-bold text-center mb-8">Perfil</h1>
+
+        {/* User Avatar and Email */}
+        <div className="flex flex-col items-center mb-8">
+          <Avatar className="h-24 w-24 mb-4 bg-primary">
+            <AvatarFallback className="text-3xl text-primary-foreground">
+              {getInitials(fullName)}
+            </AvatarFallback>
+          </Avatar>
+          <p className="text-lg text-muted-foreground">{email}</p>
+        </div>
+
+        {/* Menu Options */}
+        <div className="space-y-3">
           <Button
             variant="ghost"
-            size="icon"
-            onClick={() => navigate("/dashboard")}
+            className="w-full justify-start h-16 text-lg font-normal hover:bg-muted"
+            onClick={() => navigate("/users")}
           >
-            <ArrowLeft className="w-5 h-5" />
+            <MessageCircle className="mr-3 h-5 w-5" />
+            Conversar com Usuários
           </Button>
-          <div className="flex items-center gap-2">
-            <User className="w-5 h-5 text-primary" />
-            <h1 className="text-xl font-bold">Meu Perfil</h1>
-          </div>
+
+          <Button
+            variant="ghost"
+            className="w-full justify-start h-16 text-lg font-normal hover:bg-muted"
+            onClick={() => {
+              toast({
+                title: "Em breve",
+                description: "Funcionalidade em desenvolvimento",
+              });
+            }}
+          >
+            <KeyRound className="mr-3 h-5 w-5" />
+            Alterar Senha
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="w-full justify-start h-16 text-lg font-normal hover:bg-muted"
+            onClick={() => navigate("/profile/edit")}
+          >
+            <Settings className="mr-3 h-5 w-5" />
+            Gerenciar Dados
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="w-full justify-start h-16 text-lg font-normal hover:bg-muted"
+            onClick={() => {
+              toast({
+                title: "Em breve",
+                description: "Funcionalidade em desenvolvimento",
+              });
+            }}
+          >
+            <HelpCircle className="mr-3 h-5 w-5" />
+            Ajuda e Suporte
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full h-16 text-lg border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground mt-8"
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-3 h-5 w-5" />
+            Sair (Logout)
+          </Button>
         </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <Card className="p-6">
-          <div className="flex justify-center mb-6">
-            <div className="w-24 h-24 rounded-full bg-gradient-primary flex items-center justify-center text-white text-3xl font-bold">
-              {profile.full_name?.charAt(0) || "?"}
-            </div>
-          </div>
-
-          <form onSubmit={handleSave} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="full_name">Nome Completo *</Label>
-              <Input
-                id="full_name"
-                value={profile.full_name}
-                onChange={(e) =>
-                  setProfile({ ...profile, full_name: e.target.value })
-                }
-                required
-                placeholder="Seu nome completo"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={user?.email || ""}
-                disabled
-                className="bg-muted"
-              />
-              <p className="text-xs text-muted-foreground">
-                O email não pode ser alterado
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="course">Curso</Label>
-              <Input
-                id="course"
-                value={profile.course}
-                onChange={(e) => setProfile({ ...profile, course: e.target.value })}
-                placeholder="Ex: Engenharia de Computação"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="university">Universidade</Label>
-              <Input
-                id="university"
-                value={profile.university}
-                onChange={(e) =>
-                  setProfile({ ...profile, university: e.target.value })
-                }
-                placeholder="Ex: UFMG"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">Telefone</Label>
-              <Input
-                id="phone"
-                type="tel"
-                value={profile.phone}
-                onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                placeholder="(31) 99999-9999"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="hobbies">Hobbies</Label>
-              <Textarea
-                id="hobbies"
-                value={hobbiesText}
-                onChange={(e) => setHobbiesText(e.target.value)}
-                placeholder="Música, esportes, jogos... (separe por vírgula)"
-                rows={3}
-              />
-              <p className="text-xs text-muted-foreground">
-                Ajude seus colegas a conhecerem você melhor!
-              </p>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full"
-              variant="hero"
-              disabled={saving}
-            >
-              <Save className="w-4 h-4" />
-              {saving ? "Salvando..." : "Salvar Perfil"}
-            </Button>
-          </form>
-        </Card>
       </div>
+
+      <BottomNav />
     </div>
   );
 };
