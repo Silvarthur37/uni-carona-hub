@@ -1,19 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin } from "lucide-react";
+import { Search } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
-import { Card } from "@/components/ui/card";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+// Fix for default marker icons in Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
 
 const Map = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<L.Map | null>(null);
 
   useEffect(() => {
     checkUser();
-    getUserLocation();
+    initializeMap();
   }, []);
 
   const checkUser = async () => {
@@ -23,14 +34,36 @@ const Map = () => {
     }
   };
 
-  const getUserLocation = () => {
+  const initializeMap = () => {
+    if (!mapContainer.current || mapInstance.current) return;
+
+    // Initialize map centered on Brazil
+    const map = L.map(mapContainer.current).setView([-14.235, -51.925], 4);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19,
+    }).addTo(map);
+
+    mapInstance.current = map;
+
+    // Get user location and add marker
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
+          const { latitude, longitude } = position.coords;
+          
+          setUserLocation({ lat: latitude, lng: longitude });
+          
+          // Center map on user location
+          map.setView([latitude, longitude], 13);
+          
+          // Add marker for user location
+          L.marker([latitude, longitude])
+            .addTo(map)
+            .bindPopup("Você está aqui!")
+            .openPopup();
         },
         (error) => {
           console.error("Error getting location:", error);
@@ -56,34 +89,12 @@ const Map = () => {
       </div>
 
       {/* Map Container */}
-      <div className="pt-20 px-4">
-        <Card className="w-full h-[calc(100vh-12rem)] bg-muted/30 flex items-center justify-center relative overflow-hidden">
-          {/* Placeholder for actual map implementation */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5" />
-          
-          <div className="relative z-10 text-center space-y-4 p-6">
-            <MapPin className="h-16 w-16 mx-auto text-primary" />
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold">Mapa em Desenvolvimento</h2>
-              <p className="text-muted-foreground max-w-md">
-                {userLocation
-                  ? `Sua localização: ${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`
-                  : "Permitir acesso à localização para ver o mapa"}
-              </p>
-            </div>
-          </div>
-
-          {/* Location Marker */}
-          {userLocation && (
-            <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2">
-              <Card className="p-3 bg-background shadow-lg">
-                <p className="text-sm font-medium">
-                  Você está aqui (com precisão de 18 metros)
-                </p>
-              </Card>
-            </div>
-          )}
-        </Card>
+      <div className="pt-20 px-4 pb-4">
+        <div 
+          ref={mapContainer} 
+          className="w-full h-[calc(100vh-12rem)] rounded-lg shadow-lg"
+          style={{ minHeight: '500px' }}
+        />
       </div>
 
       <BottomNav />
