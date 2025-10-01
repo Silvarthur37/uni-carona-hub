@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Search, MessageCircle, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import BottomNav from "@/components/BottomNav";
 
 type UserProfile = {
   id: string;
@@ -87,7 +88,7 @@ const UsersList = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       <div className="max-w-screen-xl mx-auto">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border">
@@ -169,6 +170,8 @@ const UsersList = () => {
           )}
         </div>
       </div>
+
+      <BottomNav />
     </div>
   );
 };

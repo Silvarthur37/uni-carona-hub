@@ -1,10 +1,10 @@
 import { NavLink } from "react-router-dom";
-import { MapPin, Star, User } from "lucide-react";
+import { MapPin, Car, User } from "lucide-react";
 
 const BottomNav = () => {
   const navItems = [
     { to: "/map", icon: MapPin, label: "Mapa" },
-    { to: "/favorites", icon: Star, label: "Favoritos" },
+    { to: "/dashboard", icon: Car, label: "Caronas" },
     { to: "/profile", icon: User, label: "Perfil" },
   ];
 
