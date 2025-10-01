@@ -4,9 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Send, MessageSquare } from "lucide-react";
-import { format } from "date-fns";
+import { ArrowLeft, Send, MessageSquare, CheckCheck, Check } from "lucide-react";
+import { format, isToday, isYesterday } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const PrivateChat = () => {
   const { userId } = useParams();
@@ -164,23 +166,45 @@ const PrivateChat = () => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
+    const messageContent = newMessage.trim();
+    setNewMessage("");
+
     try {
       const { error } = await supabase.from("private_messages").insert({
         sender_id: currentUser.id,
         receiver_id: userId,
         ride_id: rideId,
-        content: newMessage.trim(),
+        content: messageContent,
       });
 
       if (error) throw error;
-      setNewMessage("");
     } catch (error: any) {
+      setNewMessage(messageContent);
       toast({
         title: "Erro",
         description: "Não foi possível enviar a mensagem",
         variant: "destructive",
       });
     }
+  };
+
+  const formatMessageTime = (date: Date) => {
+    if (isToday(date)) {
+      return format(date, "HH:mm");
+    } else if (isYesterday(date)) {
+      return `Ontem ${format(date, "HH:mm")}`;
+    } else {
+      return format(date, "dd/MM/yyyy HH:mm", { locale: ptBR });
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
   };
 
   if (loading) {
@@ -206,94 +230,124 @@ const PrivateChat = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
+        <div className="container mx-auto px-4 py-3 flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/my-rides")}
+            onClick={() => navigate(-1)}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold">
-              {otherUser.full_name?.charAt(0) || "?"}
-            </div>
-            <div>
-              <h1 className="text-lg font-bold">{otherUser.full_name}</h1>
+          <div className="flex items-center gap-3 flex-1">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={otherUser.avatar_url || undefined} />
+              <AvatarFallback className="bg-primary text-primary-foreground">
+                {getInitials(otherUser.full_name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h1 className="text-base font-bold">{otherUser.full_name}</h1>
               {otherUser.course && (
-                <p className="text-sm text-muted-foreground">{otherUser.course}</p>
+                <p className="text-xs text-muted-foreground">{otherUser.course}</p>
               )}
             </div>
           </div>
         </div>
       </header>
 
-      <div className="flex-1 overflow-hidden">
-        <div className="container mx-auto px-4 py-6 max-w-4xl h-full">
-          <Card className="h-full flex flex-col overflow-hidden">
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p>Nenhuma mensagem ainda</p>
-                  <p className="text-sm">Inicie a conversa!</p>
-                </div>
-              ) : (
-                messages.map((message) => {
-                  const isOwn = message.sender_id === currentUser.id;
-                  return (
+      <div className="flex-1 overflow-hidden bg-muted/20">
+        <div className="container mx-auto max-w-4xl h-full flex flex-col">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center py-12 text-muted-foreground">
+                <MessageSquare className="w-16 h-16 mb-4 opacity-30" />
+                <p className="text-lg font-medium">Nenhuma mensagem ainda</p>
+                <p className="text-sm">Inicie a conversa!</p>
+              </div>
+            ) : (
+              messages.map((message, index) => {
+                const isOwn = message.sender_id === currentUser.id;
+                const showAvatar = 
+                  index === 0 || 
+                  messages[index - 1].sender_id !== message.sender_id;
+                
+                return (
+                  <div
+                    key={message.id}
+                    className={`flex gap-2 items-end ${isOwn ? "flex-row-reverse" : ""}`}
+                  >
+                    {showAvatar ? (
+                      <Avatar className="h-8 w-8 flex-shrink-0">
+                        <AvatarImage 
+                          src={isOwn ? currentUser.user_metadata?.avatar_url : otherUser.avatar_url} 
+                        />
+                        <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                          {getInitials(isOwn ? currentUser.user_metadata?.full_name || "Você" : otherUser.full_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <div className="w-8" />
+                    )}
+                    
                     <div
-                      key={message.id}
-                      className={`flex gap-3 ${isOwn ? "flex-row-reverse" : ""}`}
+                      className={`flex flex-col max-w-[70%] ${
+                        isOwn ? "items-end" : "items-start"
+                      }`}
                     >
-                      <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
-                        {isOwn
-                          ? currentUser.user_metadata?.full_name?.charAt(0) || "?"
-                          : otherUser.full_name?.charAt(0) || "?"}
-                      </div>
                       <div
-                        className={`flex-1 max-w-[70%] ${
-                          isOwn ? "items-end" : "items-start"
+                        className={`px-4 py-2 rounded-2xl shadow-sm ${
+                          isOwn
+                            ? "bg-primary text-primary-foreground rounded-br-sm"
+                            : "bg-card rounded-bl-sm"
                         }`}
                       >
-                        <div
-                          className={`p-3 rounded-2xl ${
-                            isOwn
-                              ? "bg-gradient-primary text-white"
-                              : "bg-muted"
-                          }`}
-                        >
-                          <p className="text-sm">{message.content}</p>
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {format(new Date(message.created_at), "HH:mm")}
-                        </div>
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                          {message.content}
+                        </p>
+                      </div>
+                      <div className={`flex items-center gap-1 mt-1 px-2 ${isOwn ? "flex-row-reverse" : ""}`}>
+                        <span className="text-xs text-muted-foreground">
+                          {formatMessageTime(new Date(message.created_at))}
+                        </span>
+                        {isOwn && (
+                          message.read ? (
+                            <CheckCheck className="w-3 h-3 text-primary" />
+                          ) : (
+                            <Check className="w-3 h-3 text-muted-foreground" />
+                          )
+                        )}
                       </div>
                     </div>
-                  );
-                })
-              )}
-              <div ref={messagesEndRef} />
-            </div>
+                  </div>
+                );
+              })
+            )}
+            <div ref={messagesEndRef} />
+          </div>
 
-            <form
-              onSubmit={handleSendMessage}
-              className="p-4 border-t border-border bg-card"
-            >
-              <div className="flex gap-2">
-                <Input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Digite sua mensagem..."
-                  className="flex-1"
-                />
-                <Button type="submit" disabled={!newMessage.trim()}>
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
-            </form>
-          </Card>
+          <form
+            onSubmit={handleSendMessage}
+            className="p-4 border-t border-border bg-background/95 backdrop-blur"
+          >
+            <div className="flex gap-2">
+              <Input
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Digite sua mensagem..."
+                className="flex-1 rounded-full"
+                autoComplete="off"
+              />
+              <Button 
+                type="submit" 
+                disabled={!newMessage.trim()}
+                size="icon"
+                className="rounded-full"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
