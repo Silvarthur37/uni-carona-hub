@@ -1,10 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { MapPin, Car, User } from "lucide-react";
+import { MapPin, Car, User, MessageSquare } from "lucide-react";
 
 const BottomNav = () => {
   const navItems = [
     { to: "/map", icon: MapPin, label: "Mapa" },
     { to: "/dashboard", icon: Car, label: "Caronas" },
+    { to: "/users", icon: MessageSquare, label: "Chat" },
     { to: "/profile", icon: User, label: "Perfil" },
   ];
 
