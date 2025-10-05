@@ -57,9 +57,10 @@ const PrivateChat = () => {
 
   const fetchOtherUserProfile = async () => {
     try {
+      // Security: Only select public profile fields, exclude sensitive data like phone
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, full_name, avatar_url, course, university")
         .eq("id", userId)
         .single();
 
