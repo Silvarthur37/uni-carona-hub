@@ -546,7 +546,32 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      get_safe_profile: {
+        Args: { profile_id: string }
+        Returns: {
+          avatar_url: string
+          course: string
+          created_at: string
+          full_name: string
+          hobbies: string[]
+          id: string
+          university: string
+          updated_at: string
+        }[]
+      }
+      get_safe_profiles: {
+        Args: { excluded_user_id?: string }
+        Returns: {
+          avatar_url: string
+          course: string
+          created_at: string
+          full_name: string
+          hobbies: string[]
+          id: string
+          university: string
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       badge_type:
