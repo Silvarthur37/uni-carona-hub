@@ -199,6 +199,9 @@ export type Database = {
           created_at: string | null
           full_name: string
           hobbies: string[] | null
+          home_address: string | null
+          home_lat: number | null
+          home_lng: number | null
           id: string
           phone: string | null
           university: string | null
@@ -210,6 +213,9 @@ export type Database = {
           created_at?: string | null
           full_name: string
           hobbies?: string[] | null
+          home_address?: string | null
+          home_lat?: number | null
+          home_lng?: number | null
           id: string
           phone?: string | null
           university?: string | null
@@ -221,6 +227,9 @@ export type Database = {
           created_at?: string | null
           full_name?: string
           hobbies?: string[] | null
+          home_address?: string | null
+          home_lat?: number | null
+          home_lng?: number | null
           id?: string
           phone?: string | null
           university?: string | null
@@ -546,6 +555,26 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_distance: {
+        Args: { lat1: number; lat2: number; lng1: number; lng2: number }
+        Returns: number
+      }
+      get_nearby_drivers: {
+        Args: {
+          destination_lat: number
+          destination_lng: number
+          max_distance_km?: number
+        }
+        Returns: {
+          avatar_url: string
+          course: string
+          distance_km: number
+          full_name: string
+          home_address: string
+          id: string
+          university: string
+        }[]
+      }
       get_safe_profile: {
         Args: { profile_id: string }
         Returns: {
@@ -554,6 +583,7 @@ export type Database = {
           created_at: string
           full_name: string
           hobbies: string[]
+          home_address: string
           id: string
           university: string
           updated_at: string
