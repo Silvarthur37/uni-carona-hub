@@ -17,6 +17,7 @@ import Ranking from "./pages/Ranking";
 import Map from "./pages/Map";
 import Favorites from "./pages/Favorites";
 import UsersList from "./pages/UsersList";
+import NearbyDrivers from "./pages/NearbyDrivers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/map" element={<Map />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/users" element={<UsersList />} />
+          <Route path="/nearby-drivers" element={<NearbyDrivers />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

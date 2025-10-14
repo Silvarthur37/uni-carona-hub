@@ -17,8 +17,13 @@ const ProfileEdit = () => {
   const [university, setUniversity] = useState("");
   const [phone, setPhone] = useState("");
   const [hobbiesText, setHobbiesText] = useState("");
+  const [homeAddress, setHomeAddress] = useState("");
+  const [homeAddressSearch, setHomeAddressSearch] = useState("");
+  const [homeLat, setHomeLat] = useState<number | null>(null);
+  const [homeLng, setHomeLng] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [searchingAddress, setSearchingAddress] = useState(false);
 
   useEffect(() => {
     checkUser();
@@ -48,9 +53,52 @@ const ProfileEdit = () => {
       setUniversity(profile.university || "");
       setPhone(profile.phone || "");
       setHobbiesText(profile.hobbies ? profile.hobbies.join(", ") : "");
+      setHomeAddress(profile.home_address || "");
+      setHomeAddressSearch(profile.home_address || "");
+      setHomeLat(profile.home_lat ? Number(profile.home_lat) : null);
+      setHomeLng(profile.home_lng ? Number(profile.home_lng) : null);
     }
 
     setLoading(false);
+  };
+
+  const searchHomeAddress = async () => {
+    if (!homeAddressSearch.trim()) return;
+    
+    setSearchingAddress(true);
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          homeAddressSearch
+        )}&limit=1`
+      );
+      const data = await response.json();
+      
+      if (data && data.length > 0) {
+        setHomeAddress(data[0].display_name);
+        setHomeLat(parseFloat(data[0].lat));
+        setHomeLng(parseFloat(data[0].lon));
+        toast({
+          title: "Endereço encontrado!",
+          description: "Localização definida com sucesso.",
+        });
+      } else {
+        toast({
+          title: "Endereço não encontrado",
+          description: "Tente um endereço mais específico.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error searching address:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível buscar o endereço.",
+        variant: "destructive",
+      });
+    } finally {
+      setSearchingAddress(false);
+    }
   };
 
   const handleSave = async () => {
@@ -72,6 +120,9 @@ const ProfileEdit = () => {
           university,
           phone,
           hobbies: hobbiesArray,
+          home_address: homeAddress,
+          home_lat: homeLat,
+          home_lng: homeLng,
         })
         .eq("id", user.id);
 
@@ -185,6 +236,32 @@ const ProfileEdit = () => {
                 onChange={(e) => setHobbiesText(e.target.value)}
                 placeholder="Ex: Leitura, Música, Esportes"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="homeAddress">Endereço Residencial</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="homeAddress"
+                  value={homeAddressSearch}
+                  onChange={(e) => setHomeAddressSearch(e.target.value)}
+                  placeholder="Digite seu endereço completo"
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  onClick={searchHomeAddress}
+                  disabled={searchingAddress || !homeAddressSearch.trim()}
+                  variant="secondary"
+                >
+                  {searchingAddress ? "Buscando..." : "Buscar"}
+                </Button>
+              </div>
+              {homeAddress && (
+                <p className="text-sm text-muted-foreground">
+                  Endereço salvo: {homeAddress}
+                </p>
+              )}
             </div>
 
             <Button type="submit" className="w-full" disabled={saving}>

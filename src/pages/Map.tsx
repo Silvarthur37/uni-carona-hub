@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Navigation, MapPin, Route as RouteIcon, Loader2 } from "lucide-react";
+import { Navigation, MapPin, Route as RouteIcon, Loader2, Users } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { useToast } from "@/hooks/use-toast";
 import L from "leaflet";
@@ -276,6 +276,16 @@ const Map = () => {
     }
   };
 
+  const handleFindNearbyDrivers = () => {
+    if (destinationLocation) {
+      navigate(
+        `/nearby-drivers?lat=${destinationLocation.lat}&lng=${destinationLocation.lng}&destination=${encodeURIComponent(
+          destinationLocation.name
+        )}`
+      );
+    }
+  };
+
   useEffect(() => {
     if (originLocation && destinationLocation) {
       calculateRoute();
@@ -338,7 +348,7 @@ const Map = () => {
 
           {/* Route Info */}
           {routeInfo && (
-            <Card className="p-3 bg-card/80">
+            <Card className="p-3 bg-card/80 space-y-3">
               <div className="flex justify-around text-sm">
                 <div className="text-center">
                   <p className="text-muted-foreground">Distância</p>
@@ -353,6 +363,15 @@ const Map = () => {
                   <p className="font-bold text-primary">{routeInfo.price}</p>
                 </div>
               </div>
+              <Button
+                onClick={handleFindNearbyDrivers}
+                className="w-full"
+                variant="default"
+                size="sm"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Buscar Motoristas Próximos
+              </Button>
             </Card>
           )}
 
