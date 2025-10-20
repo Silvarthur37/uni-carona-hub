@@ -385,10 +385,10 @@ const Map = () => {
       </div>
 
       {/* Map Container */}
-      <div className="pt-[280px] px-4 pb-4">
+      <div className="pt-[280px] px-4">
         <div 
           ref={mapContainer} 
-          className="w-full h-[calc(100vh-20rem)] rounded-lg shadow-lg border border-border"
+          className="w-full h-[calc(100vh-380px)] rounded-lg shadow-lg border border-border"
           style={{ minHeight: '400px' }}
         />
       </div>
