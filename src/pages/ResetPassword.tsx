@@ -17,22 +17,41 @@ const ResetPassword = () => {
   const [isValidSession, setIsValidSession] = useState(false);
 
   useEffect(() => {
-    // Verificar se há uma sessão de recuperação válida
+    // Listener para capturar quando o Supabase processa o token de recuperação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsValidSession(true);
+      } else if (event === 'SIGNED_IN' && session) {
+        setIsValidSession(true);
+      }
+    });
+
+    // Verificar sessão atual
     checkSession();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const checkSession = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     
-    if (!session) {
-      toast({
-        title: "Link inválido ou expirado",
-        description: "Por favor, solicite um novo link de recuperação",
-        variant: "destructive",
-      });
-      setTimeout(() => navigate("/forgot-password"), 2000);
-    } else {
+    if (session) {
       setIsValidSession(true);
+    } else {
+      // Aguardar um pouco para o Supabase processar os tokens da URL
+      setTimeout(async () => {
+        const { data: { session: newSession } } = await supabase.auth.getSession();
+        if (!newSession) {
+          toast({
+            title: "Link inválido ou expirado",
+            description: "Por favor, solicite um novo link de recuperação",
+            variant: "destructive",
+          });
+          setTimeout(() => navigate("/forgot-password"), 2000);
+        }
+      }, 1000);
     }
   };
 
