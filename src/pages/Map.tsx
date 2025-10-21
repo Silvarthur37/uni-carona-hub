@@ -295,7 +295,7 @@ const Map = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Search Controls */}
-      <div className="fixed top-0 left-0 right-0 z-10 bg-background/95 backdrop-blur border-b border-border">
+      <div className="fixed top-0 left-0 right-0 z-20 bg-background/95 backdrop-blur border-b border-border">
         <div className="max-w-screen-xl mx-auto p-4 space-y-3">
           <h1 className="text-xl font-bold flex items-center gap-2">
             <RouteIcon className="w-5 h-5" />
@@ -385,7 +385,7 @@ const Map = () => {
       </div>
 
       {/* Map Container */}
-      <div className="pt-[280px] px-4">
+      <div className="pt-[280px] px-4 relative z-0">
         <div 
           ref={mapContainer} 
           className="w-full h-[calc(100vh-380px)] rounded-lg shadow-lg border border-border"
