@@ -96,12 +96,7 @@ const Profile = () => {
           <Button
             variant="ghost"
             className="w-full justify-start h-16 text-lg font-normal hover:bg-muted"
-            onClick={() => {
-              toast({
-                title: "Em breve",
-                description: "Funcionalidade em desenvolvimento",
-              });
-            }}
+            onClick={() => navigate("/change-password")}
           >
             <KeyRound className="mr-3 h-5 w-5" />
             Alterar Senha

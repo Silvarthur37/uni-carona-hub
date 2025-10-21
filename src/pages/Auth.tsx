@@ -150,15 +150,28 @@ const Auth = () => {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          {isLogin ? "Novo por aqui? " : "Já tem uma conta? "}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-primary font-medium hover:underline"
-          >
-            {isLogin ? "Criar conta" : "Fazer login"}
-          </button>
-        </p>
+        <div className="space-y-2 mt-4">
+          <p className="text-center text-sm text-muted-foreground">
+            {isLogin ? "Novo por aqui? " : "Já tem uma conta? "}
+            <button
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-primary font-medium hover:underline"
+            >
+              {isLogin ? "Criar conta" : "Fazer login"}
+            </button>
+          </p>
+
+          {isLogin && (
+            <p className="text-center text-sm text-muted-foreground">
+              <button
+                onClick={() => navigate("/forgot-password")}
+                className="text-primary font-medium hover:underline"
+              >
+                Esqueceu sua senha?
+              </button>
+            </p>
+          )}
+        </div>
       </Card>
     </div>
   );

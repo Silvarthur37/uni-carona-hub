@@ -18,6 +18,9 @@ import Map from "./pages/Map";
 import Favorites from "./pages/Favorites";
 import UsersList from "./pages/UsersList";
 import NearbyDrivers from "./pages/NearbyDrivers";
+import ChangePassword from "./pages/ChangePassword";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +47,9 @@ const App = () => (
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/users" element={<UsersList />} />
           <Route path="/nearby-drivers" element={<NearbyDrivers />} />
+          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
