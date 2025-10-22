@@ -21,6 +21,30 @@ const MyRides = () => {
     checkUser();
   }, []);
 
+  useEffect(() => {
+    if (!user) return;
+
+    // Subscription para atualizações em tempo real
+    const channel = supabase
+      .channel('my-rides-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'ride_participants'
+        },
+        () => {
+          fetchMyRides(user.id);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   const checkUser = async () => {
     const {
       data: { user },

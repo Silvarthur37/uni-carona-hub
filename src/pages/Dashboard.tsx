@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
+import { Notifications } from "@/components/Notifications";
 import {
   Car,
   Plus,
@@ -98,6 +99,7 @@ const Dashboard = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <Notifications />
             <Button
               variant="ghost"
               size="sm"

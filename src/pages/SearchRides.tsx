@@ -29,6 +29,41 @@ const SearchRides = () => {
     checkUser();
   }, []);
 
+  useEffect(() => {
+    if (!user) return;
+
+    // Subscription para atualizações em tempo real
+    const channel = supabase
+      .channel('rides-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'rides'
+        },
+        () => {
+          fetchRides();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'ride_participants'
+        },
+        () => {
+          fetchRides();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   const checkUser = async () => {
     const {
       data: { user },
@@ -52,6 +87,10 @@ const SearchRides = () => {
             full_name,
             avatar_url,
             course
+          ),
+          ride_participants!ride_participants_ride_id_fkey (
+            id,
+            status
           )
         `
         )
@@ -60,7 +99,20 @@ const SearchRides = () => {
         .order("departure_time", { ascending: true });
 
       if (error) throw error;
-      setRides(data || []);
+      
+      // Calcular vagas disponíveis considerando participantes confirmados
+      const ridesWithAvailableSeats = (data || []).map(ride => {
+        const confirmedParticipants = ride.ride_participants?.filter(
+          (p: any) => p.status === "confirmado"
+        ).length || 0;
+        
+        return {
+          ...ride,
+          remainingSeats: ride.available_seats - confirmedParticipants
+        };
+      }).filter(ride => ride.remainingSeats > 0); // Mostrar apenas com vagas disponíveis
+      
+      setRides(ridesWithAvailableSeats);
     } catch (error: any) {
       console.error("Erro ao buscar caronas:", error);
     } finally {
@@ -210,7 +262,9 @@ const SearchRides = () => {
                   <div className="flex items-center gap-4 text-sm">
                     <div className="flex items-center gap-1">
                       <Users className="w-4 h-4 text-muted-foreground" />
-                      <span>{ride.available_seats} vagas</span>
+                      <span className={ride.remainingSeats <= 2 ? "text-destructive font-medium" : ""}>
+                        {ride.remainingSeats} {ride.remainingSeats === 1 ? "vaga" : "vagas"}
+                      </span>
                     </div>
                     {ride.price && (
                       <div className="flex items-center gap-1">
