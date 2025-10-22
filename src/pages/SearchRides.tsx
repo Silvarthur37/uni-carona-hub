@@ -78,6 +78,9 @@ const SearchRides = () => {
 
   const fetchRides = async () => {
     try {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) return;
+
       const { data, error } = await supabase
         .from("rides")
         .select(
@@ -90,15 +93,22 @@ const SearchRides = () => {
           ),
           ride_participants!ride_participants_ride_id_fkey (
             id,
-            status
+            status,
+            passenger_id
           )
         `
         )
         .eq("status", "pendente")
         .gte("departure_time", new Date().toISOString())
+        .neq("driver_id", currentUser.id)
         .order("departure_time", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro na query:", error);
+        throw error;
+      }
+      
+      console.log("Caronas encontradas:", data?.length);
       
       // Calcular vagas disponíveis considerando participantes confirmados
       const ridesWithAvailableSeats = (data || []).map(ride => {
@@ -106,12 +116,18 @@ const SearchRides = () => {
           (p: any) => p.status === "confirmado"
         ).length || 0;
         
+        const alreadyRequested = ride.ride_participants?.some(
+          (p: any) => p.passenger_id === currentUser.id
+        );
+        
         return {
           ...ride,
-          remainingSeats: ride.available_seats - confirmedParticipants
+          remainingSeats: ride.available_seats - confirmedParticipants,
+          alreadyRequested
         };
-      }).filter(ride => ride.remainingSeats > 0); // Mostrar apenas com vagas disponíveis
+      }).filter(ride => ride.remainingSeats > 0);
       
+      console.log("Caronas após filtro:", ridesWithAvailableSeats.length);
       setRides(ridesWithAvailableSeats);
     } catch (error: any) {
       console.error("Erro ao buscar caronas:", error);
@@ -281,8 +297,9 @@ const SearchRides = () => {
                       e.stopPropagation();
                       handleRequestRide(ride.id);
                     }}
+                    disabled={ride.alreadyRequested}
                   >
-                    Solicitar
+                    {ride.alreadyRequested ? "Solicitado" : "Solicitar"}
                   </Button>
                 </div>
               </Card>

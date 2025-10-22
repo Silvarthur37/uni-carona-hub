@@ -186,14 +186,14 @@ const MyRides = () => {
                 {driverRides.map((ride) => (
                   <Card key={ride.id} className="p-6">
                     <div className="flex items-start justify-between mb-4">
-                      <div>
+                      <div className="flex-1">
                         <div className="flex items-center gap-2 text-sm mb-2">
                           <MapPin className="w-4 h-4 text-primary" />
                           <span>{ride.origin}</span>
                           <span className="text-muted-foreground">→</span>
                           <span>{ride.destination}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                           <Calendar className="w-4 h-4" />
                           <span>
                             {format(
@@ -201,6 +201,19 @@ const MyRides = () => {
                               "dd/MM/yyyy 'às' HH:mm"
                             )}
                           </span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm mt-3">
+                          <div className="flex items-center gap-1">
+                            <Users className="w-4 h-4 text-muted-foreground" />
+                            <span className="font-medium">
+                              {ride.ride_participants?.filter((p: any) => p.status === "confirmado").length || 0} / {ride.available_seats} confirmados
+                            </span>
+                          </div>
+                          {ride.ride_participants?.filter((p: any) => p.status === "pendente").length > 0 && (
+                            <span className="text-xs px-2 py-1 rounded-full bg-accent/20 text-accent font-medium">
+                              {ride.ride_participants.filter((p: any) => p.status === "pendente").length} pendente(s)
+                            </span>
+                          )}
                         </div>
                       </div>
                       <Button
