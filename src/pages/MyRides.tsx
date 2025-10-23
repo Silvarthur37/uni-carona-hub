@@ -255,15 +255,24 @@ const MyRides = () => {
 
                             <div className="flex gap-2">
                               {participant.status === "confirmado" && (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() =>
-                                    navigate(`/chat/${participant.profiles.id}?ride=${ride.id}`)
-                                  }
-                                >
-                                  <MessageCircle className="w-4 h-4" />
-                                </Button>
+                                <>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() =>
+                                      navigate(`/chat/${participant.passenger_id}?ride=${ride.id}`)
+                                    }
+                                  >
+                                    <MessageCircle className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="secondary"
+                                    onClick={() => navigate(`/map?passengerId=${participant.passenger_id}`)}
+                                  >
+                                    <MapPin className="w-4 h-4" />
+                                  </Button>
+                                </>
                               )}
                               {participant.status === "pendente" && (
                                 <>
