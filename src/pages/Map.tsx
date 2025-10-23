@@ -70,38 +70,52 @@ const Map = () => {
 
       if (error) throw error;
 
-      if (ride && ride.origin_lat && ride.origin_lng) {
-        // Configurar destino como origem da carona (onde o passageiro está esperando)
-        setDestinationLocation({
-          lat: ride.origin_lat,
-          lng: ride.origin_lng,
-          name: ride.origin,
-        });
-        setDestination(ride.origin);
+      if (ride) {
+        let originLat = ride.origin_lat;
+        let originLng = ride.origin_lng;
 
-        // Usar localização atual como origem
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((position) => {
-            const { latitude, longitude } = position.coords;
-            setOriginLocation({
-              lat: latitude,
-              lng: longitude,
-              name: "Sua localização atual",
-            });
-            setOrigin("Sua localização atual");
-          });
+        // Se as coordenadas não existirem, buscar pelo nome do local
+        if (!originLat || !originLng) {
+          const location = await searchLocation(ride.origin);
+          if (location) {
+            originLat = location.lat;
+            originLng = location.lng;
+          }
         }
 
-        toast({
-          title: "Rota para o passageiro",
-          description: `Traçando rota até ${ride.origin}`,
-        });
-      } else {
-        toast({
-          title: "Aviso",
-          description: "Carona não possui localização de origem",
-          variant: "destructive",
-        });
+        if (originLat && originLng) {
+          // Configurar destino como origem da carona (onde o passageiro está esperando)
+          setDestinationLocation({
+            lat: originLat,
+            lng: originLng,
+            name: ride.origin,
+          });
+          setDestination(ride.origin);
+
+          // Usar localização atual como origem
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+              const { latitude, longitude } = position.coords;
+              setOriginLocation({
+                lat: latitude,
+                lng: longitude,
+                name: "Sua localização atual",
+              });
+              setOrigin("Sua localização atual");
+            });
+          }
+
+          toast({
+            title: "Rota para o passageiro",
+            description: `Traçando rota até ${ride.origin}`,
+          });
+        } else {
+          toast({
+            title: "Erro",
+            description: "Não foi possível encontrar a localização de origem",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       console.error("Erro ao buscar carona:", error);
