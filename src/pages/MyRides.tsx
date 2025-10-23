@@ -4,16 +4,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Car, Users, MapPin, Calendar, Check, X, MessageCircle } from "lucide-react";
+import { ArrowLeft, Car, Users, MapPin, Calendar, Check, X, MessageCircle, Play, Square } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const MyRides = () => {
   const [user, setUser] = useState<any>(null);
   const [driverRides, setDriverRides] = useState<any[]>([]);
   const [passengerRides, setPassengerRides] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionRideId, setActionRideId] = useState<string | null>(null);
+  const [actionType, setActionType] = useState<'start' | 'finish' | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -135,6 +147,42 @@ const MyRides = () => {
     }
   };
 
+  const handleRideStatusUpdate = async (
+    rideId: string, 
+    newStatus: 'em_andamento' | 'concluida'
+  ) => {
+    try {
+      const { error } = await supabase
+        .from("rides")
+        .update({ status: newStatus })
+        .eq("id", rideId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso!",
+        description: newStatus === "em_andamento" 
+          ? "Carona iniciada com sucesso!" 
+          : "Carona finalizada com sucesso!",
+      });
+
+      fetchMyRides(user.id);
+      setActionRideId(null);
+      setActionType(null);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openConfirmDialog = (rideId: string, type: 'start' | 'finish') => {
+    setActionRideId(rideId);
+    setActionType(type);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -217,13 +265,35 @@ const MyRides = () => {
                           )}
                         </div>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => navigate(`/ride/${ride.id}`)}
-                      >
-                        Ver Detalhes
-                      </Button>
+                      <div className="flex gap-2">
+                        {ride.status === "pendente" && ride.ride_participants?.filter((p: any) => p.status === "confirmado").length > 0 && (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => openConfirmDialog(ride.id, 'start')}
+                          >
+                            <Play className="w-4 h-4 mr-1" />
+                            Iniciar
+                          </Button>
+                        )}
+                        {ride.status === "em_andamento" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openConfirmDialog(ride.id, 'finish')}
+                          >
+                            <Square className="w-4 h-4 mr-1" />
+                            Finalizar
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => navigate(`/ride/${ride.id}`)}
+                        >
+                          Ver Detalhes
+                        </Button>
+                      </div>
                     </div>
 
                     {ride.ride_participants?.length > 0 && (
@@ -399,6 +469,37 @@ const MyRides = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <AlertDialog open={actionRideId !== null} onOpenChange={() => {
+        setActionRideId(null);
+        setActionType(null);
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {actionType === 'start' ? 'Iniciar Carona?' : 'Finalizar Carona?'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {actionType === 'start' 
+                ? 'Tem certeza que deseja iniciar esta carona? Os passageiros confirmados serão notificados.'
+                : 'Tem certeza que deseja finalizar esta carona? Esta ação marcará a carona como concluída.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              if (actionRideId) {
+                handleRideStatusUpdate(
+                  actionRideId, 
+                  actionType === 'start' ? 'em_andamento' : 'concluida'
+                );
+              }
+            }}>
+              Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
