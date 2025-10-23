@@ -67,6 +67,7 @@ const MyRides = () => {
           *,
           ride_participants (
             id,
+            passenger_id,
             status,
             profiles (
               full_name,
