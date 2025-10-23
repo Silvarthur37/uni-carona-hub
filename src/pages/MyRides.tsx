@@ -269,7 +269,7 @@ const MyRides = () => {
                                   <Button
                                     size="sm"
                                     variant="secondary"
-                                    onClick={() => navigate(`/map?passengerId=${participant.passenger_id}`)}
+                                    onClick={() => navigate(`/map?rideId=${ride.id}`)}
                                   >
                                     <MapPin className="w-4 h-4" />
                                   </Button>

@@ -45,10 +45,10 @@ const Map = () => {
     checkUser();
     initializeMap();
     
-    // Se passengerId estiver na URL, buscar localização do passageiro
-    const passengerId = searchParams.get('passengerId');
-    if (passengerId && passengerId !== 'undefined') {
-      fetchPassengerLocation(passengerId);
+    // Se rideId estiver na URL, buscar localização da carona
+    const rideId = searchParams.get('rideId');
+    if (rideId && rideId !== 'undefined') {
+      fetchRideLocation(rideId);
     }
   }, [searchParams]);
 
@@ -59,25 +59,25 @@ const Map = () => {
     }
   };
 
-  const fetchPassengerLocation = async (passengerId: string) => {
+  const fetchRideLocation = async (rideId: string) => {
     try {
       setLoading(true);
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('full_name, home_address, home_lat, home_lng')
-        .eq('id', passengerId)
+      const { data: ride, error } = await supabase
+        .from('rides')
+        .select('origin, origin_lat, origin_lng, destination, destination_lat, destination_lng')
+        .eq('id', rideId)
         .single();
 
       if (error) throw error;
 
-      if (profile && profile.home_lat && profile.home_lng) {
-        // Configurar destino como localização do passageiro
+      if (ride && ride.origin_lat && ride.origin_lng) {
+        // Configurar destino como origem da carona (onde o passageiro está esperando)
         setDestinationLocation({
-          lat: profile.home_lat,
-          lng: profile.home_lng,
-          name: profile.home_address || profile.full_name,
+          lat: ride.origin_lat,
+          lng: ride.origin_lng,
+          name: ride.origin,
         });
-        setDestination(profile.home_address || profile.full_name);
+        setDestination(ride.origin);
 
         // Usar localização atual como origem
         if (navigator.geolocation) {
@@ -94,20 +94,20 @@ const Map = () => {
 
         toast({
           title: "Rota para o passageiro",
-          description: `Traçando rota até ${profile.full_name}`,
+          description: `Traçando rota até ${ride.origin}`,
         });
       } else {
         toast({
           title: "Aviso",
-          description: "Passageiro não possui endereço cadastrado",
+          description: "Carona não possui localização de origem",
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error("Erro ao buscar passageiro:", error);
+      console.error("Erro ao buscar carona:", error);
       toast({
         title: "Erro",
-        description: "Não foi possível buscar localização do passageiro",
+        description: "Não foi possível buscar localização da carona",
         variant: "destructive",
       });
     } finally {
