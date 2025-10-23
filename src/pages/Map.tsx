@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ type Location = {
 
 const Map = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
@@ -43,12 +44,74 @@ const Map = () => {
   useEffect(() => {
     checkUser();
     initializeMap();
-  }, []);
+    
+    // Se passengerId estiver na URL, buscar localização do passageiro
+    const passengerId = searchParams.get('passengerId');
+    if (passengerId && passengerId !== 'undefined') {
+      fetchPassengerLocation(passengerId);
+    }
+  }, [searchParams]);
 
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       navigate("/auth");
+    }
+  };
+
+  const fetchPassengerLocation = async (passengerId: string) => {
+    try {
+      setLoading(true);
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('full_name, home_address, home_lat, home_lng')
+        .eq('id', passengerId)
+        .single();
+
+      if (error) throw error;
+
+      if (profile && profile.home_lat && profile.home_lng) {
+        // Configurar destino como localização do passageiro
+        setDestinationLocation({
+          lat: profile.home_lat,
+          lng: profile.home_lng,
+          name: profile.home_address || profile.full_name,
+        });
+        setDestination(profile.home_address || profile.full_name);
+
+        // Usar localização atual como origem
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            const { latitude, longitude } = position.coords;
+            setOriginLocation({
+              lat: latitude,
+              lng: longitude,
+              name: "Sua localização atual",
+            });
+            setOrigin("Sua localização atual");
+          });
+        }
+
+        toast({
+          title: "Rota para o passageiro",
+          description: `Traçando rota até ${profile.full_name}`,
+        });
+      } else {
+        toast({
+          title: "Aviso",
+          description: "Passageiro não possui endereço cadastrado",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao buscar passageiro:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível buscar localização do passageiro",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
