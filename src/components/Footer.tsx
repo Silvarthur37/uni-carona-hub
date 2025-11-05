@@ -11,7 +11,7 @@ const Footer = () => {
               <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
                 <Car className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">UniRide</span>
+              <span className="text-xl font-bold">PickMe Trip</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Mobilidade inteligente para universitários
@@ -48,7 +48,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-          <p>© 2025 UniRide. Todos os direitos reservados.</p>
+          <p>© 2025 PickMe Trip. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>

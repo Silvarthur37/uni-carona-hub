@@ -51,7 +51,7 @@ const Auth = () => {
 
         toast({
           title: "Conta criada!",
-          description: "Bem-vindo ao UniRide",
+          description: "Bem-vindo ao PickMe Trip",
         });
         navigate("/dashboard");
       }
@@ -73,7 +73,7 @@ const Auth = () => {
           <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
             <Car className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-2xl font-bold">UniRide</h1>
+          <h1 className="text-2xl font-bold">PickMe Trip</h1>
         </div>
 
         <div className="flex gap-2 mb-6">

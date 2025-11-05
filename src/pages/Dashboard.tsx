@@ -95,7 +95,7 @@ const Dashboard = () => {
             <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
               <Car className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold">UniRide</span>
+            <span className="text-xl font-bold">PickMe Trip</span>
           </div>
 
           <div className="flex items-center gap-2">

@@ -70,7 +70,7 @@ const EcoImpact = () => {
                 <div>
                   <h3 className="font-bold mb-2">Painel Coletivo</h3>
                   <p className="text-sm text-muted-foreground">
-                    "Nossa universidade já reduziu 50 toneladas de CO₂ com UniRide!"
+                    "Nossa universidade já reduziu 50 toneladas de CO₂ com PickMe Trip!"
                   </p>
                 </div>
               </div>

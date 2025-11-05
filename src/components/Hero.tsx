@@ -27,7 +27,7 @@ const Hero = () => {
             
             <p className="text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0">
               Conecte-se com colegas, economize dinheiro e ajude o planeta. 
-              UniRide transforma cada viagem em uma experiência única.
+              PickMe Trip transforma cada viagem em uma experiência única.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
