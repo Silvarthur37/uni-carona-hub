@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { MessageCircle, LogOut, KeyRound, Settings, HelpCircle } from "lucide-react";
+import { MessageCircle, LogOut, KeyRound, Settings, HelpCircle, Smartphone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
 
@@ -109,6 +109,15 @@ const Profile = () => {
           >
             <Settings className="mr-3 h-5 w-5" />
             Gerenciar Dados
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="w-full justify-start h-16 text-lg font-normal hover:bg-muted"
+            onClick={() => navigate("/install")}
+          >
+            <Smartphone className="mr-3 h-5 w-5" />
+            Instalar Aplicativo
           </Button>
 
           <Button
