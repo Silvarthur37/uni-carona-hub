@@ -71,3 +71,43 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## Progressive Web App (PWA)
+
+Este projeto está configurado como um Progressive Web App, permitindo instalação em dispositivos móveis e desktop.
+
+### Funcionalidades PWA
+
+- **Instalação**: O app pode ser instalado na tela inicial do dispositivo
+- **Offline**: Funciona mesmo sem conexão à internet (cache de assets estáticos)
+- **Atualizações automáticas**: Service Worker atualiza automaticamente quando há novas versões
+- **Experiência nativa**: Interface otimizada para mobile e desktop
+
+### Como instalar no celular
+
+**Android (Chrome/Edge)**
+1. Acesse o site pelo navegador
+2. Toque no menu (⋮) e selecione "Instalar app" ou "Adicionar à tela inicial"
+3. Confirme a instalação
+
+**iOS (Safari)**
+1. Acesse o site pelo Safari
+2. Toque no botão de compartilhar (quadrado com seta)
+3. Role para baixo e toque em "Adicionar à Tela de Início"
+4. Confirme tocando em "Adicionar"
+
+### Build e Deploy
+
+O PWA é automaticamente ativado durante o build de produção:
+
+```sh
+npm run build
+```
+
+O Service Worker e manifest são gerados automaticamente pelo `vite-plugin-pwa`.
+
+### Desativação do PWA
+
+Para desativar o PWA (caso necessário), remova ou comente o plugin `VitePWA` no arquivo `vite.config.ts`.
+
+**Importante**: A implementação do PWA não altera nenhuma funcionalidade existente do projeto. Apenas adiciona capacidades de instalação e cache offline.
